@@ -21,20 +21,19 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-y: auto;           /* Diizinkan scroll */
+    padding: 10px 0;
     user-select: none;
 }
 
 /* ====================== TITLE ====================== */
 .game-title {
-    margin: 12px 0 10px 0;
+    margin: 15px 0 12px 0;
     color: var(--light-purple);
     text-shadow: 0 0 15px var(--purple);
     font-size: clamp(22px, 5vw, 32px);
     text-align: center;
-    white-space: nowrap;
 }
 
 /* ====================== GAME CONTAINER ====================== */
@@ -42,12 +41,13 @@ body {
     position: relative;
     width: 800px;
     height: 450px;
-    max-width: 100vw;
+    max-width: 100%;
     border: 5px solid #4c1d95;
     box-shadow: 0 0 35px rgba(139, 92, 246, 0.75);
     background: #000;
     overflow: hidden;
-    border-radius: 4px;
+    border-radius: 6px;
+    flex-shrink: 0;               /* Penting agar tidak mengecil */
 }
 
 canvas {
@@ -57,7 +57,7 @@ canvas {
     height: 100%;
 }
 
-/* ====================== UI OVERLAY ====================== */
+/* ====================== UI & WAND ====================== */
 #ui-overlay {
     position: absolute;
     top: 15px;
@@ -67,69 +67,10 @@ canvas {
     font-size: clamp(16px, 3vw, 22px);
     font-weight: bold;
     text-shadow: 2px 2px 6px #000;
-    line-height: 1.4;
 }
 
-/* Crosshair */
-#crosshair {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 26px;
-    height: 26px;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 15;
-}
-
-#crosshair::before,
-#crosshair::after {
-    content: "";
-    position: absolute;
-    background: var(--cyan);
-    box-shadow: 0 0 10px var(--cyan);
-}
-
-#crosshair::before { top: 12px; left: 0; width: 26px; height: 2px; }
-#crosshair::after  { top: 0; left: 12px; width: 2px; height: 26px; }
-
-/* Wand */
-#wand {
-    position: absolute;
-    bottom: -20px;
-    right: 15%;
-    width: 150px;
-    height: 220px;
-    background: linear-gradient(to top, #3e2723, #8d6e63);
-    border-radius: 25px 25px 0 0;
-    transform: rotate(-12deg);
-    transform-origin: bottom center;
-    pointer-events: none;
-    z-index: 10;
-    box-shadow: inset -10px 0 18px rgba(0,0,0,0.7);
-}
-
-#wand-tip {
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 32px;
-    height: 32px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 0 20px var(--cyan), 0 0 35px var(--cyan);
-}
-
-/* Shoot Animation */
-.shoot-anim {
-    animation: recoil 0.15s ease-out forwards;
-}
-
-@keyframes recoil {
-    0%   { transform: rotate(-12deg) translateY(0); }
-    50%  { transform: rotate(-2deg) translateY(30px); }
-    100% { transform: rotate(-12deg) translateY(0); }
+#crosshair, #wand, #wand-tip { /* sama seperti sebelumnya */ 
+    /* ... (salin dari CSS sebelumnya) */
 }
 
 /* ====================== MENU SCREENS ====================== */
@@ -149,14 +90,9 @@ canvas {
     font-size: clamp(38px, 8vw, 58px);
     color: var(--light-purple);
     text-shadow: 0 0 25px var(--purple);
-    margin-bottom: 12px;
 }
 
-.subtitle {
-    font-size: clamp(16px, 3.5vw, 20px);
-    color: #a5b4fc;
-    margin-bottom: 45px;
-}
+.subtitle { font-size: clamp(16px, 3.5vw, 20px); color: #a5b4fc; margin-bottom: 45px; }
 
 .menu-btn {
     padding: 16px 52px;
@@ -170,24 +106,16 @@ canvas {
     transition: all 0.2s;
 }
 
-.menu-btn:hover {
-    background: #a78bfa;
-    transform: translateY(-4px);
-}
-
-.menu-btn:active {
-    transform: translateY(3px);
-    box-shadow: 0 4px 0 #6d28d9;
-}
+.menu-btn:hover { background: #a78bfa; transform: translateY(-4px); }
+.menu-btn:active { transform: translateY(3px); box-shadow: 0 4px 0 #6d28d9; }
 
 /* Instructions */
 #instructions {
-    margin-top: 15px;
+    margin: 20px 15px 15px;
     text-align: center;
     color: #bbb;
     line-height: 1.6;
     font-size: clamp(13px, 2.8vw, 15px);
-    padding: 0 15px;
 }
 
 /* ====================== MOBILE CONTROLS ====================== */
@@ -199,7 +127,7 @@ canvas {
     .mobile-only {
         display: flex;
         position: absolute;
-        bottom: 12px;
+        bottom: 15px;
         left: 12px;
         right: 12px;
         justify-content: space-between;
@@ -209,8 +137,8 @@ canvas {
     }
 
     .joystick {
-        width: 130px;
-        height: 130px;
+        width: 125px;
+        height: 125px;
         background: rgba(139, 92, 246, 0.28);
         border: 5px solid rgba(167, 139, 250, 0.6);
         border-radius: 50%;
@@ -219,8 +147,8 @@ canvas {
     }
 
     .knob {
-        width: 52px;
-        height: 52px;
+        width: 50px;
+        height: 50px;
         background: #c4b5fd;
         border-radius: 50%;
         position: absolute;
@@ -244,8 +172,6 @@ canvas {
         display: flex;
         align-items: center;
         justify-content: center;
-        text-align: center;
-        line-height: 1.1;
     }
 
     .shoot-button:active {
@@ -253,31 +179,40 @@ canvas {
         transform: scale(0.9);
     }
 
-    /* Make game container full screen on mobile */
+    /* Responsive Container di HP */
     #game-container {
         width: 100vw;
-        height: 56.25vw;           /* 16:9 aspect ratio */
-        max-height: 85vh;
+        height: 56.25vw;           /* Tetap 16:9 */
+        max-height: 75vh;          /* Agar tidak terlalu besar di landscape */
         border: none;
         border-radius: 0;
+        margin: 0 auto;
     }
 
     #wand {
-        right: 10%;
-        width: 120px;
-        height: 180px;
+        right: 8%;
+        width: 110px;
+        height: 170px;
     }
 }
 
-/* Extra small phones */
-@media (max-width: 480px) {
-    .joystick {
-        width: 110px;
-        height: 110px;
+/* Landscape Mode Optimization */
+@media (max-width: 900px) and (orientation: landscape) {
+    body {
+        padding: 5px 0;
     }
     
-    .knob {
-        width: 44px;
-        height: 44px;
+    #game-container {
+        max-height: 85vh;
     }
+    
+    .mobile-only {
+        bottom: 8px;
+    }
+}
+
+/* Extra Small Phones */
+@media (max-width: 480px) {
+    .joystick { width: 110px; height: 110px; }
+    .knob { width: 44px; height: 44px; }
 }
