@@ -1,6 +1,6 @@
 /* =====================================================
    WIZARD SANCTUARY - Raycasting FPS
-   game.js - VERSI FINAL
+   game.js - VERSI FINAL + MUSIK
 ===================================================== */
 
 const canvas = document.getElementById("gameCanvas");
@@ -14,6 +14,10 @@ const finalScore = document.getElementById("final-score");
 const restartBtn = document.getElementById("restartBtn");
 const startScreen = document.getElementById("start-screen");
 const startBtn = document.getElementById("startBtn");
+
+// ====================== AUDIO MUSIC ======================
+const bgm = document.getElementById("bgm");
+bgm.volume = 0.65;   // Atur volume musik di sini
 
 // ====================== KONFIGURASI ======================
 const MAP_WIDTH = 12;
@@ -176,6 +180,11 @@ function startGame() {
 
     hpUI.textContent = "100";
     scoreUI.textContent = "0";
+
+    // PUTAR MUSIK
+    bgm.play().catch(err => {
+        console.log("Musik tidak bisa diputar otomatis:", err);
+    });
 }
 
 function triggerGameOver() {
@@ -183,6 +192,9 @@ function triggerGameOver() {
     gameStarted = false;
     finalScore.textContent = player.score;
     gameOverScreen.style.display = "flex";
+
+    // MATIKAN MUSIK SAAT GAME OVER
+    bgm.pause();
 }
 
 // ====================== UPDATE ======================
@@ -192,14 +204,12 @@ function update() {
     const moveSpeed = 0.065;
     const rotSpeed = 0.045;
 
-    // Rotation
     if (keys.a || turnLeft) player.angle -= rotSpeed;
     if (keys.d || turnRight) player.angle += rotSpeed;
 
     const dx = Math.cos(player.angle) * moveSpeed;
     const dy = Math.sin(player.angle) * moveSpeed;
 
-    // Movement
     if (keys.w || moveForward) {
         if (map[Math.floor(player.y) * MAP_WIDTH + Math.floor(player.x + dx * 3)] === 0) player.x += dx;
         if (map[Math.floor(player.y + dy * 3) * MAP_WIDTH + Math.floor(player.x)] === 0) player.y += dy;
@@ -284,7 +294,6 @@ function update() {
 
 // ====================== DRAW ======================
 function draw() {
-    // Sky & Floor
     ctx.fillStyle = "#0f0a1f";
     ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
     ctx.fillStyle = "#1f1a2e";
@@ -292,7 +301,6 @@ function draw() {
 
     const depthBuffer = [];
 
-    // Raycasting Walls
     for (let i = 0; i < NUM_RAYS; i++) {
         const rayAngle = (player.angle - HALF_FOV) + (i * DELTA_ANGLE);
         let distance = 0;
@@ -323,7 +331,6 @@ function draw() {
         ctx.fillRect(i * RAY_WIDTH, (canvas.height - wallHeight)/2, RAY_WIDTH + 1, wallHeight);
     }
 
-    // Sprites (Enemies & Spells)
     let sprites = [];
 
     enemies.forEach(e => {
