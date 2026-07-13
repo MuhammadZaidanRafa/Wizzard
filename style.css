@@ -3,14 +3,19 @@
     --cyan: #00ffff;
     --red: #ff4444;
     --green: #4dff4d;
+    --light-purple: #c4b5fd;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     background: #0a001f;
     color: #fff;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Arial', Helvetica, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,9 +26,10 @@ body {
 
 .game-title {
     margin: 10px 0 8px 0;
-    color: #c4b5fd;
+    color: var(--light-purple);
     text-shadow: 0 0 12px var(--purple);
     font-size: 28px;
+    text-align: center;
 }
 
 #game-container {
@@ -41,7 +47,7 @@ canvas {
     image-rendering: pixelated;
 }
 
-/* UI */
+/* UI Overlay */
 #ui-overlay {
     position: absolute;
     top: 12px;
@@ -53,6 +59,7 @@ canvas {
     text-shadow: 2px 2px 6px #000;
 }
 
+/* Crosshair */
 #crosshair {
     position: absolute;
     top: 50%;
@@ -103,6 +110,7 @@ canvas {
     box-shadow: 0 0 15px var(--cyan), 0 0 30px var(--cyan);
 }
 
+/* Shoot Animation */
 .shoot-anim {
     animation: recoil 0.15s ease-out forwards;
 }
@@ -113,53 +121,7 @@ canvas {
     100% { transform: rotate(-12deg) translateY(0); }
 }
 
-/* Game Over */
-#game-over {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-#game-over h1 {
-    color: var(--red);
-    font-size: 62px;
-    text-shadow: 0 0 15px red;
-    margin-bottom: 15px;
-}
-
-#game-over button {
-    margin-top: 20px;
-    padding: 14px 36px;
-    font-size: 22px;
-    background: var(--purple);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 5px 0 #6b21a8;
-    transition: 0.2s;
-}
-
-#game-over button:hover { background: #a78bfa; }
-#game-over button:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0 #6b21a8;
-}
-
-/* Instructions */
-#instructions {
-    margin-top: 12px;
-    text-align: center;
-    color: #bbb;
-    line-height: 1.6;
-    font-size: 15px;
-}
-/* MENU SCREENS */
+/* Menu Screens */
 .menu-screen {
     position: absolute;
     inset: 0;
@@ -174,8 +136,8 @@ canvas {
 
 .menu-screen h1 {
     font-size: 52px;
-    color: #c4b5fd;
-    text-shadow: 0 0 20px #8b5cf6;
+    color: var(--light-purple);
+    text-shadow: 0 0 20px var(--purple);
     margin-bottom: 10px;
 }
 
@@ -188,7 +150,7 @@ canvas {
 .menu-btn {
     padding: 16px 48px;
     font-size: 24px;
-    background: #8b5cf6;
+    background: var(--purple);
     color: white;
     border: none;
     border-radius: 12px;
@@ -205,4 +167,88 @@ canvas {
 .menu-btn:active {
     transform: translateY(4px);
     box-shadow: 0 4px 0 #6d28d9;
+}
+
+/* Instructions */
+#instructions {
+    margin-top: 12px;
+    text-align: center;
+    color: #bbb;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+/* ====================== MOBILE CONTROLS ====================== */
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .mobile-only {
+        display: flex;
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        justify-content: space-between;
+        align-items: flex-end;
+        z-index: 30;
+        pointer-events: none;
+    }
+
+    .joystick {
+        width: 120px;
+        height: 120px;
+        background: rgba(139, 92, 246, 0.25);
+        border: 4px solid rgba(167, 139, 250, 0.7);
+        border-radius: 50%;
+        position: relative;
+        pointer-events: all;
+    }
+
+    .knob {
+        width: 48px;
+        height: 48px;
+        background: #c4b5fd;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 15px #a5b4fc;
+    }
+
+    .shoot-button {
+        pointer-events: all;
+        width: 110px;
+        height: 110px;
+        background: rgba(236, 72, 153, 0.9);
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        border: none;
+        border-radius: 50%;
+        box-shadow: 0 0 25px #ec4899;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .shoot-button:active {
+        background: #f472b6;
+        transform: scale(0.92);
+    }
+
+    #game-container {
+        width: 100vw;
+        height: 56.25vw;
+        max-height: 100vh;
+        border: none;
+    }
+
+    .game-title {
+        font-size: 24px;
+    }
 }
