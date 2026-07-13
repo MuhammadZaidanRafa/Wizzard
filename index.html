@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧙 Wizard Sanctuary: Enemies Unveiled</title>
+    <title>🧙 Wizard Sanctuary</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h2 class="game-title">🧙‍♂️ Wizard Sanctuary: Enemies Unveiled 🔮</h2>
+    <h2 class="game-title">🧙‍♂️ Wizard Sanctuary 🔮</h2>
     
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="450"></canvas>
@@ -23,10 +23,18 @@
             <div id="wand-tip"></div>
         </div>
 
-        <div id="game-over">
+        <!-- START SCREEN -->
+        <div id="start-screen" class="menu-screen">
+            <h1>WIZARD SANCTUARY</h1>
+            <p class="subtitle">Defend the Sanctuary from Dark Creatures</p>
+            <button id="startBtn" class="menu-btn">MULAI PERMAINAN</button>
+        </div>
+
+        <!-- GAME OVER -->
+        <div id="game-over" class="menu-screen" style="display: none;">
             <h1>GAME OVER</h1>
             <p>Skor Akhir: <span id="final-score">0</span></p>
-            <button id="restartBtn">Main Lagi</button>
+            <button id="restartBtn" class="menu-btn">MAIN LAGI</button>
         </div>
     </div>
 
