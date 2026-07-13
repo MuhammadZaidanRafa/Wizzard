@@ -1,6 +1,6 @@
 /* =====================================================
    WIZARD SANCTUARY - Raycasting FPS
-   game.js - Versi Final Rapi
+   game.js - Versi Final Rapi + Start Screen
 ===================================================== */
 
 const canvas = document.getElementById("gameCanvas");
@@ -12,11 +12,12 @@ const scoreUI = document.getElementById("score-ui");
 const gameOverScreen = document.getElementById("game-over");
 const finalScore = document.getElementById("final-score");
 const restartBtn = document.getElementById("restartBtn");
+const startScreen = document.getElementById("start-screen");
+const startBtn = document.getElementById("startBtn");
 
 // ====================== KONFIGURASI ======================
 const MAP_WIDTH = 12;
 const MAP_HEIGHT = 12;
-const TILE_SIZE = 1; // ukuran tile dalam world space
 
 const map = [
     1,1,1,1,1,1,1,1,1,1,1,1,
@@ -35,16 +36,12 @@ const map = [
 
 // Player
 let player = {
-    x: 1.5,
-    y: 1.5,
-    angle: 0,
-    hp: 100,
-    score: 0,
-    alive: true
+    x: 1.5, y: 1.5, angle: 0,
+    hp: 100, score: 0, alive: true
 };
 
-// Raycasting Settings
-const FOV = Math.PI / 3;           // 60 derajat
+// Raycasting
+const FOV = Math.PI / 3;
 const HALF_FOV = FOV / 2;
 const NUM_RAYS = 400;
 const RAY_WIDTH = canvas.width / NUM_RAYS;
@@ -52,14 +49,15 @@ const DELTA_ANGLE = FOV / NUM_RAYS;
 const MAX_DEPTH = 16;
 
 // Game Objects
-let spells = [];        // Peluru player
-let enemySpells = [];   // Peluru musuh
+let spells = [];
+let enemySpells = [];
 let enemies = [];
+let gameStarted = false;
 
 // Input
 const keys = { w: false, a: false, s: false, d: false };
 
-// ====================== EVENT LISTENER ======================
+// ====================== EVENT LISTENERS ======================
 window.addEventListener("keydown", e => {
     if (e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = true;
 });
@@ -69,14 +67,12 @@ window.addEventListener("keyup", e => {
 });
 
 canvas.addEventListener("mousedown", e => {
-    if (!player.alive || e.button !== 0) return;
+    if (!player.alive || !gameStarted || e.button !== 0) return;
 
-    // Animasi tongkat
     wand.classList.remove("shoot-anim");
     void wand.offsetWidth;
     wand.classList.add("shoot-anim");
 
-    // Tembak sihir
     spells.push({
         x: player.x,
         y: player.y,
@@ -113,25 +109,43 @@ function spawnEnemy() {
     });
 }
 
-// Spawn awal
-for (let i = 0; i < 4; i++) spawnEnemy();
-setInterval(spawnEnemy, 3800);
+// ====================== START GAME ======================
+function startGame() {
+    gameStarted = true;
+    startScreen.style.display = "none";
+
+    player = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0, alive: true };
+    spells = [];
+    enemySpells = [];
+    enemies = [];
+    
+    for (let i = 0; i < 4; i++) spawnEnemy();
+
+    hpUI.textContent = "100";
+    scoreUI.textContent = "0";
+}
+
+// ====================== GAME OVER ======================
+function triggerGameOver() {
+    player.alive = false;
+    gameStarted = false;
+    finalScore.textContent = player.score;
+    gameOverScreen.style.display = "flex";
+}
 
 // ====================== UPDATE ======================
 function update() {
-    if (!player.alive) return;
+    if (!player.alive || !gameStarted) return;
 
     const moveSpeed = 0.065;
     const rotSpeed = 0.045;
 
-    // Rotasi
     if (keys.a) player.angle -= rotSpeed;
     if (keys.d) player.angle += rotSpeed;
 
     const dx = Math.cos(player.angle) * moveSpeed;
     const dy = Math.sin(player.angle) * moveSpeed;
 
-    // Gerakan maju/mundur + collision
     if (keys.w) {
         if (map[Math.floor(player.y) * MAP_WIDTH + Math.floor(player.x + dx * 3)] === 0) player.x += dx;
         if (map[Math.floor(player.y + dy * 3) * MAP_WIDTH + Math.floor(player.x)] === 0) player.y += dy;
@@ -141,7 +155,7 @@ function update() {
         if (map[Math.floor(player.y - dy * 3) * MAP_WIDTH + Math.floor(player.x)] === 0) player.y -= dy;
     }
 
-    // Update peluru player
+    // Update Spells (Player)
     for (let i = spells.length - 1; i >= 0; i--) {
         const s = spells[i];
         s.x += s.dirX * s.speed;
@@ -152,7 +166,6 @@ function update() {
             continue;
         }
 
-        // Hit musuh
         for (let j = enemies.length - 1; j >= 0; j--) {
             const e = enemies[j];
             if (Math.hypot(e.x - s.x, e.y - s.y) < 0.45) {
@@ -168,39 +181,34 @@ function update() {
         }
     }
 
-    // Update peluru musuh + AI
+    // Update Enemies + Enemy Spells
     const now = Date.now();
     for (let i = 0; i < enemies.length; i++) {
         const e = enemies[i];
-        const edx = player.x - e.x;
-        const edy = player.y - e.y;
-        const dist = Math.hypot(edx, edy);
+        const dx = player.x - e.x;
+        const dy = player.y - e.y;
+        const dist = Math.hypot(dx, dy);
         e.bob += 0.12;
 
-        // Gerak AI
         if (dist > 3) {
-            const nx = e.x + (edx / dist) * e.speed;
-            const ny = e.y + (edy / dist) * e.speed;
+            const nx = e.x + (dx / dist) * e.speed;
+            const ny = e.y + (dy / dist) * e.speed;
             if (map[Math.floor(e.y) * MAP_WIDTH + Math.floor(nx)] === 0) e.x = nx;
             if (map[Math.floor(ny) * MAP_WIDTH + Math.floor(e.x)] === 0) e.y = ny;
         }
 
-        // Tembak musuh
         if (dist < 8 && now - e.lastShot > 1800) {
-            const angle = Math.atan2(edy, edx) + (Math.random() - 0.5) * 0.15;
+            const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.15;
             enemySpells.push({
-                x: e.x,
-                y: e.y,
-                dirX: Math.cos(angle),
-                dirY: Math.sin(angle),
-                speed: 0.13,
-                color: '#f87171'
+                x: e.x, y: e.y,
+                dirX: Math.cos(angle), dirY: Math.sin(angle),
+                speed: 0.13, color: '#f87171'
             });
             e.lastShot = now;
         }
     }
 
-    // Update peluru musuh
+    // Update Enemy Spells
     for (let i = enemySpells.length - 1; i >= 0; i--) {
         const es = enemySpells[i];
         es.x += es.dirX * es.speed;
@@ -216,18 +224,14 @@ function update() {
             hpUI.textContent = Math.max(0, Math.floor(player.hp));
             enemySpells.splice(i, 1);
 
-            if (player.hp <= 0) {
-                player.alive = false;
-                finalScore.textContent = player.score;
-                gameOverScreen.style.display = "flex";
-            }
+            if (player.hp <= 0) triggerGameOver();
         }
     }
 }
 
-// ====================== RENDER ======================
+// ====================== DRAW ======================
 function draw() {
-    // Langit & Lantai
+    // Sky & Floor
     ctx.fillStyle = "#0f0a1f";
     ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
     ctx.fillStyle = "#1f1a2e";
@@ -260,33 +264,28 @@ function draw() {
         depthBuffer[i] = correctedDist;
 
         const wallHeight = Math.min(canvas.height, canvas.height / correctedDist);
-
         const shade = Math.max(0.15, 1 - (correctedDist / MAX_DEPTH) * 0.85);
-        ctx.fillStyle = `rgb(${40 * shade}, ${25 * shade}, ${70 * shade})`;
-        ctx.fillRect(i * RAY_WIDTH, (canvas.height - wallHeight) / 2, RAY_WIDTH + 1, wallHeight);
+
+        ctx.fillStyle = `rgb(${40*shade}, ${25*shade}, ${70*shade})`;
+        ctx.fillRect(i * RAY_WIDTH, (canvas.height - wallHeight)/2, RAY_WIDTH + 1, wallHeight);
     }
 
-    // Render Sprites (Musuh + Peluru)
+    // Sprites Rendering
     let sprites = [];
 
     enemies.forEach(e => {
-        sprites.push({
-            x: e.x, y: e.y, type: 'enemy', color: e.color, dist: 0, angle: 0,
-            bob: Math.sin(e.bob) * 0.12, hp: e.hp, entity: e
-        });
+        sprites.push({ x: e.x, y: e.y, type: 'enemy', color: e.color, bob: Math.sin(e.bob)*0.12 });
     });
+    spells.forEach(s => sprites.push({ x: s.x, y: s.y, type: 'spell', color: '#67e8f9', size: 0.18 }));
+    enemySpells.forEach(es => sprites.push({ x: es.x, y: es.y, type: 'spell', color: es.color, size: 0.16 }));
 
-    spells.forEach(s => sprites.push({x: s.x, y: s.y, type: 'spell', color: '#67e8f9', size: 0.18}));
-    enemySpells.forEach(es => sprites.push({x: es.x, y: es.y, type: 'spell', color: es.color, size: 0.16}));
-
-    // Hitung jarak & sudut
     sprites.forEach(s => {
         const sx = s.x - player.x;
         const sy = s.y - player.y;
         s.dist = Math.hypot(sx, sy);
         let angle = Math.atan2(sy, sx) - player.angle;
-        while (angle < -Math.PI) angle += Math.PI * 2;
-        while (angle > Math.PI) angle -= Math.PI * 2;
+        while (angle < -Math.PI) angle += Math.PI*2;
+        while (angle > Math.PI) angle -= Math.PI*2;
         s.angle = angle;
     });
 
@@ -320,23 +319,20 @@ function draw() {
 
 // ====================== GAME LOOP ======================
 function gameLoop() {
-    update();
-    draw();
+    if (gameStarted) {
+        update();
+        draw();
+    }
     requestAnimationFrame(gameLoop);
 }
 
-// ====================== RESTART ======================
-restartBtn.addEventListener("click", () => {
-    player = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0, alive: true };
-    spells = [];
-    enemySpells = [];
-    enemies = [];
-    for (let i = 0; i < 4; i++) spawnEnemy();
+// ====================== BUTTON EVENTS ======================
+startBtn.addEventListener("click", startGame);
 
-    hpUI.textContent = "100";
-    scoreUI.textContent = "0";
+restartBtn.addEventListener("click", () => {
     gameOverScreen.style.display = "none";
+    startGame();
 });
 
-// Start Game
+// Mulai aplikasi
 gameLoop();
