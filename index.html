@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>🧙 Wizard Sanctuary</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -14,11 +14,13 @@
         <canvas id="gameCanvas" width="800" height="450"></canvas>
         <div id="crosshair"></div>
         
+        <!-- UI Overlay -->
         <div id="ui-overlay">
             <div>❤️ HP: <span id="hp-ui">100</span></div>
             <div>⭐ Skor: <span id="score-ui">0</span></div>
         </div>
         
+        <!-- Wand -->
         <div id="wand">
             <div id="wand-tip"></div>
         </div>
@@ -26,7 +28,7 @@
         <!-- START SCREEN -->
         <div id="start-screen" class="menu-screen">
             <h1>WIZARD SANCTUARY</h1>
-            <p class="subtitle">Defend the Sanctuary from Dark Creatures</p>
+            <p class="subtitle">Lawan Gerombolan Kegelapan!</p>
             <button id="startBtn" class="menu-btn">MULAI PERMAINAN</button>
         </div>
 
@@ -36,12 +38,23 @@
             <p>Skor Akhir: <span id="final-score">0</span></p>
             <button id="restartBtn" class="menu-btn">MAIN LAGI</button>
         </div>
+
+        <!-- MOBILE CONTROLS -->
+        <div id="mobile-controls" class="mobile-only">
+            <!-- Virtual Joystick -->
+            <div id="joystick-area" class="joystick">
+                <div id="joystick-knob" class="knob"></div>
+            </div>
+            
+            <!-- Tombol Tembak -->
+            <button id="shoot-btn" class="shoot-button">🔮<br>TEMBAK</button>
+        </div>
     </div>
 
     <div id="instructions">
         <strong>Kontrol:</strong><br>
-        W = Maju | S = Mundur | A = Putar Kiri | D = Putar Kanan<br>
-        Klik Kiri Mouse = Tembak Sihir
+        W = Maju | S = Mundur | A/D = Putar<br>
+        Klik Kiri = Tembak Sihir
     </div>
 
 <script src="game.js"></script>
