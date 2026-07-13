@@ -1,6 +1,6 @@
 /* =====================================================
    WIZARD SANCTUARY - Raycasting FPS
-   game.js - Versi Final Rapi + Start Screen
+   game.js - VERSI FINAL
 ===================================================== */
 
 const canvas = document.getElementById("gameCanvas");
@@ -40,7 +40,7 @@ let player = {
     hp: 100, score: 0, alive: true
 };
 
-// Raycasting
+// Raycasting Settings
 const FOV = Math.PI / 3;
 const HALF_FOV = FOV / 2;
 const NUM_RAYS = 400;
@@ -57,6 +57,12 @@ let gameStarted = false;
 // Input
 const keys = { w: false, a: false, s: false, d: false };
 
+// Mobile Controls
+let moveForward = false;
+let moveBackward = false;
+let turnLeft = false;
+let turnRight = false;
+
 // ====================== EVENT LISTENERS ======================
 window.addEventListener("keydown", e => {
     if (e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = true;
@@ -66,9 +72,57 @@ window.addEventListener("keyup", e => {
     if (e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = false;
 });
 
+// Mouse Shoot (Desktop)
 canvas.addEventListener("mousedown", e => {
     if (!player.alive || !gameStarted || e.button !== 0) return;
+    shoot();
+});
 
+// ====================== MOBILE CONTROLS ======================
+const joystickArea = document.getElementById("joystick-area");
+const joystickKnob = document.getElementById("joystick-knob");
+const shootBtn = document.getElementById("shoot-btn");
+
+let joystickActive = false;
+let joystickCenterX = 0;
+let joystickCenterY = 0;
+
+joystickArea.addEventListener("touchstart", e => {
+    joystickActive = true;
+    const rect = joystickArea.getBoundingClientRect();
+    joystickCenterX = rect.left + rect.width / 2;
+    joystickCenterY = rect.top + rect.height / 2;
+});
+
+joystickArea.addEventListener("touchmove", e => {
+    if (!joystickActive) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    let dx = touch.clientX - joystickCenterX;
+    let dy = touch.clientY - joystickCenterY;
+    const distance = Math.min(45, Math.hypot(dx, dy));
+
+    joystickKnob.style.transform = `translate(${dx * 0.4}px, ${dy * 0.4}px)`;
+
+    moveForward = dy < -15;
+    moveBackward = dy > 15;
+    turnLeft = dx < -20;
+    turnRight = dx > 20;
+});
+
+joystickArea.addEventListener("touchend", () => {
+    joystickActive = false;
+    joystickKnob.style.transform = "translate(-50%, -50%)";
+    moveForward = moveBackward = turnLeft = turnRight = false;
+});
+
+// Shoot Button (Mobile)
+shootBtn.addEventListener("touchstart", e => {
+    e.preventDefault();
+    if (player.alive && gameStarted) shoot();
+});
+
+function shoot() {
     wand.classList.remove("shoot-anim");
     void wand.offsetWidth;
     wand.classList.add("shoot-anim");
@@ -80,7 +134,7 @@ canvas.addEventListener("mousedown", e => {
         dirY: Math.sin(player.angle),
         speed: 0.28
     });
-});
+}
 
 // ====================== MUSUH ======================
 function spawnEnemy() {
@@ -109,7 +163,7 @@ function spawnEnemy() {
     });
 }
 
-// ====================== START GAME ======================
+// ====================== START & GAME OVER ======================
 function startGame() {
     gameStarted = true;
     startScreen.style.display = "none";
@@ -118,14 +172,12 @@ function startGame() {
     spells = [];
     enemySpells = [];
     enemies = [];
-    
     for (let i = 0; i < 4; i++) spawnEnemy();
 
     hpUI.textContent = "100";
     scoreUI.textContent = "0";
 }
 
-// ====================== GAME OVER ======================
 function triggerGameOver() {
     player.alive = false;
     gameStarted = false;
@@ -140,22 +192,24 @@ function update() {
     const moveSpeed = 0.065;
     const rotSpeed = 0.045;
 
-    if (keys.a) player.angle -= rotSpeed;
-    if (keys.d) player.angle += rotSpeed;
+    // Rotation
+    if (keys.a || turnLeft) player.angle -= rotSpeed;
+    if (keys.d || turnRight) player.angle += rotSpeed;
 
     const dx = Math.cos(player.angle) * moveSpeed;
     const dy = Math.sin(player.angle) * moveSpeed;
 
-    if (keys.w) {
+    // Movement
+    if (keys.w || moveForward) {
         if (map[Math.floor(player.y) * MAP_WIDTH + Math.floor(player.x + dx * 3)] === 0) player.x += dx;
         if (map[Math.floor(player.y + dy * 3) * MAP_WIDTH + Math.floor(player.x)] === 0) player.y += dy;
     }
-    if (keys.s) {
+    if (keys.s || moveBackward) {
         if (map[Math.floor(player.y) * MAP_WIDTH + Math.floor(player.x - dx * 3)] === 0) player.x -= dx;
         if (map[Math.floor(player.y - dy * 3) * MAP_WIDTH + Math.floor(player.x)] === 0) player.y -= dy;
     }
 
-    // Update Spells (Player)
+    // Player Spells
     for (let i = spells.length - 1; i >= 0; i--) {
         const s = spells[i];
         s.x += s.dirX * s.speed;
@@ -181,24 +235,24 @@ function update() {
         }
     }
 
-    // Update Enemies + Enemy Spells
+    // Enemies AI + Shooting
     const now = Date.now();
     for (let i = 0; i < enemies.length; i++) {
         const e = enemies[i];
-        const dx = player.x - e.x;
-        const dy = player.y - e.y;
-        const dist = Math.hypot(dx, dy);
+        const edx = player.x - e.x;
+        const edy = player.y - e.y;
+        const dist = Math.hypot(edx, edy);
         e.bob += 0.12;
 
         if (dist > 3) {
-            const nx = e.x + (dx / dist) * e.speed;
-            const ny = e.y + (dy / dist) * e.speed;
+            const nx = e.x + (edx / dist) * e.speed;
+            const ny = e.y + (edy / dist) * e.speed;
             if (map[Math.floor(e.y) * MAP_WIDTH + Math.floor(nx)] === 0) e.x = nx;
             if (map[Math.floor(ny) * MAP_WIDTH + Math.floor(e.x)] === 0) e.y = ny;
         }
 
         if (dist < 8 && now - e.lastShot > 1800) {
-            const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.15;
+            const angle = Math.atan2(edy, edx) + (Math.random() - 0.5) * 0.15;
             enemySpells.push({
                 x: e.x, y: e.y,
                 dirX: Math.cos(angle), dirY: Math.sin(angle),
@@ -208,7 +262,7 @@ function update() {
         }
     }
 
-    // Update Enemy Spells
+    // Enemy Spells
     for (let i = enemySpells.length - 1; i >= 0; i--) {
         const es = enemySpells[i];
         es.x += es.dirX * es.speed;
@@ -223,7 +277,6 @@ function update() {
             player.hp -= 18;
             hpUI.textContent = Math.max(0, Math.floor(player.hp));
             enemySpells.splice(i, 1);
-
             if (player.hp <= 0) triggerGameOver();
         }
     }
@@ -270,7 +323,7 @@ function draw() {
         ctx.fillRect(i * RAY_WIDTH, (canvas.height - wallHeight)/2, RAY_WIDTH + 1, wallHeight);
     }
 
-    // Sprites Rendering
+    // Sprites (Enemies & Spells)
     let sprites = [];
 
     enemies.forEach(e => {
@@ -334,5 +387,10 @@ restartBtn.addEventListener("click", () => {
     startGame();
 });
 
-// Mulai aplikasi
+// Spawn interval
+setInterval(() => {
+    if (gameStarted && player.alive) spawnEnemy();
+}, 3800);
+
+// Mulai Game
 gameLoop();
