@@ -4,8 +4,10 @@
     --red: #ff4444;
     --green: #4dff4d;
     --light-purple: #c4b5fd;
+    --dark-bg: #0a001f;
 }
 
+/* ====================== RESET & BASE ====================== */
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +15,7 @@
 }
 
 body {
-    background: #0a001f;
+    background: var(--dark-bg);
     color: #fff;
     font-family: 'Arial', Helvetica, sans-serif;
     display: flex;
@@ -22,41 +24,50 @@ body {
     justify-content: center;
     min-height: 100vh;
     overflow: hidden;
+    user-select: none;
 }
 
+/* ====================== TITLE ====================== */
 .game-title {
-    margin: 10px 0 8px 0;
+    margin: 12px 0 10px 0;
     color: var(--light-purple);
-    text-shadow: 0 0 12px var(--purple);
-    font-size: 28px;
+    text-shadow: 0 0 15px var(--purple);
+    font-size: clamp(22px, 5vw, 32px);
     text-align: center;
+    white-space: nowrap;
 }
 
+/* ====================== GAME CONTAINER ====================== */
 #game-container {
     position: relative;
     width: 800px;
     height: 450px;
+    max-width: 100vw;
     border: 5px solid #4c1d95;
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.7);
+    box-shadow: 0 0 35px rgba(139, 92, 246, 0.75);
     background: #000;
     overflow: hidden;
+    border-radius: 4px;
 }
 
 canvas {
     display: block;
     image-rendering: pixelated;
+    width: 100%;
+    height: 100%;
 }
 
-/* UI Overlay */
+/* ====================== UI OVERLAY ====================== */
 #ui-overlay {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 15px;
+    left: 15px;
     z-index: 20;
     pointer-events: none;
-    font-size: 20px;
+    font-size: clamp(16px, 3vw, 22px);
     font-weight: bold;
     text-shadow: 2px 2px 6px #000;
+    line-height: 1.4;
 }
 
 /* Crosshair */
@@ -64,8 +75,8 @@ canvas {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 15;
@@ -76,38 +87,38 @@ canvas {
     content: "";
     position: absolute;
     background: var(--cyan);
-    box-shadow: 0 0 8px var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
 }
 
-#crosshair::before { top: 10px; left: 0; width: 22px; height: 2px; }
-#crosshair::after  { top: 0; left: 10px; width: 2px; height: 22px; }
+#crosshair::before { top: 12px; left: 0; width: 26px; height: 2px; }
+#crosshair::after  { top: 0; left: 12px; width: 2px; height: 26px; }
 
 /* Wand */
 #wand {
     position: absolute;
-    bottom: -25px;
-    right: 18%;
-    width: 140px;
-    height: 210px;
+    bottom: -20px;
+    right: 15%;
+    width: 150px;
+    height: 220px;
     background: linear-gradient(to top, #3e2723, #8d6e63);
-    border-radius: 20px 20px 0 0;
+    border-radius: 25px 25px 0 0;
     transform: rotate(-12deg);
     transform-origin: bottom center;
     pointer-events: none;
     z-index: 10;
-    box-shadow: inset -8px 0 15px rgba(0,0,0,0.7);
+    box-shadow: inset -10px 0 18px rgba(0,0,0,0.7);
 }
 
 #wand-tip {
     position: absolute;
-    top: -12px;
+    top: -15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     background: white;
     border-radius: 50%;
-    box-shadow: 0 0 15px var(--cyan), 0 0 30px var(--cyan);
+    box-shadow: 0 0 20px var(--cyan), 0 0 35px var(--cyan);
 }
 
 /* Shoot Animation */
@@ -117,15 +128,15 @@ canvas {
 
 @keyframes recoil {
     0%   { transform: rotate(-12deg) translateY(0); }
-    50%  { transform: rotate(-2deg) translateY(28px); }
+    50%  { transform: rotate(-2deg) translateY(30px); }
     100% { transform: rotate(-12deg) translateY(0); }
 }
 
-/* Menu Screens */
+/* ====================== MENU SCREENS ====================== */
 .menu-screen {
     position: absolute;
     inset: 0;
-    background: rgba(10, 0, 31, 0.95);
+    background: rgba(10, 0, 31, 0.96);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -135,21 +146,21 @@ canvas {
 }
 
 .menu-screen h1 {
-    font-size: 52px;
+    font-size: clamp(38px, 8vw, 58px);
     color: var(--light-purple);
-    text-shadow: 0 0 20px var(--purple);
-    margin-bottom: 10px;
+    text-shadow: 0 0 25px var(--purple);
+    margin-bottom: 12px;
 }
 
 .subtitle {
-    font-size: 18px;
+    font-size: clamp(16px, 3.5vw, 20px);
     color: #a5b4fc;
-    margin-bottom: 40px;
+    margin-bottom: 45px;
 }
 
 .menu-btn {
-    padding: 16px 48px;
-    font-size: 24px;
+    padding: 16px 52px;
+    font-size: clamp(20px, 4.5vw, 26px);
     background: var(--purple);
     color: white;
     border: none;
@@ -161,21 +172,22 @@ canvas {
 
 .menu-btn:hover {
     background: #a78bfa;
-    transform: translateY(-3px);
+    transform: translateY(-4px);
 }
 
 .menu-btn:active {
-    transform: translateY(4px);
+    transform: translateY(3px);
     box-shadow: 0 4px 0 #6d28d9;
 }
 
 /* Instructions */
 #instructions {
-    margin-top: 12px;
+    margin-top: 15px;
     text-align: center;
     color: #bbb;
     line-height: 1.6;
-    font-size: 15px;
+    font-size: clamp(13px, 2.8vw, 15px);
+    padding: 0 15px;
 }
 
 /* ====================== MOBILE CONTROLS ====================== */
@@ -187,9 +199,9 @@ canvas {
     .mobile-only {
         display: flex;
         position: absolute;
-        bottom: 15px;
-        left: 15px;
-        right: 15px;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
         justify-content: space-between;
         align-items: flex-end;
         z-index: 30;
@@ -197,31 +209,31 @@ canvas {
     }
 
     .joystick {
-        width: 120px;
-        height: 120px;
-        background: rgba(139, 92, 246, 0.25);
-        border: 4px solid rgba(167, 139, 250, 0.7);
+        width: 130px;
+        height: 130px;
+        background: rgba(139, 92, 246, 0.28);
+        border: 5px solid rgba(167, 139, 250, 0.6);
         border-radius: 50%;
         position: relative;
         pointer-events: all;
     }
 
     .knob {
-        width: 48px;
-        height: 48px;
+        width: 52px;
+        height: 52px;
         background: #c4b5fd;
         border-radius: 50%;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        box-shadow: 0 0 15px #a5b4fc;
+        box-shadow: 0 0 18px #a5b4fc;
     }
 
     .shoot-button {
         pointer-events: all;
-        width: 110px;
-        height: 110px;
+        width: 115px;
+        height: 115px;
         background: rgba(236, 72, 153, 0.9);
         color: white;
         font-size: 15px;
@@ -233,22 +245,39 @@ canvas {
         align-items: center;
         justify-content: center;
         text-align: center;
-        line-height: 1.2;
+        line-height: 1.1;
     }
 
     .shoot-button:active {
         background: #f472b6;
-        transform: scale(0.92);
+        transform: scale(0.9);
     }
 
+    /* Make game container full screen on mobile */
     #game-container {
         width: 100vw;
-        height: 56.25vw;
-        max-height: 100vh;
+        height: 56.25vw;           /* 16:9 aspect ratio */
+        max-height: 85vh;
         border: none;
+        border-radius: 0;
     }
 
-    .game-title {
-        font-size: 24px;
+    #wand {
+        right: 10%;
+        width: 120px;
+        height: 180px;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+    .joystick {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .knob {
+        width: 44px;
+        height: 44px;
     }
 }
