@@ -159,3 +159,50 @@ canvas {
     line-height: 1.6;
     font-size: 15px;
 }
+/* MENU SCREENS */
+.menu-screen {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 0, 31, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    text-align: center;
+}
+
+.menu-screen h1 {
+    font-size: 52px;
+    color: #c4b5fd;
+    text-shadow: 0 0 20px #8b5cf6;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #a5b4fc;
+    margin-bottom: 40px;
+}
+
+.menu-btn {
+    padding: 16px 48px;
+    font-size: 24px;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #6d28d9;
+    transition: all 0.2s;
+}
+
+.menu-btn:hover {
+    background: #a78bfa;
+    transform: translateY(-3px);
+}
+
+.menu-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 #6d28d9;
+}
